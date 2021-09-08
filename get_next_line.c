@@ -10,17 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-//Regular text
-#define BLK "\e[0;30m"
-#define RED "\e[0;31m"
-#define GRN "\e[0;32m"
-#define YEL "\e[0;33m"
-#define BLU "\e[0;34m"
-#define MAG "\e[0;35m"
-#define CYN "\e[0;36m"
-#define WHT "\e[0;37m"
-#define reset "\e[0m"
-
 #include "get_next_line.h"
 #include <stdio.h>
 
@@ -38,16 +27,17 @@ char	*get_one_line(const char *buf, char **save_buf, char *line1);
 char	*get_next_line(int fd)
 {
 	char		*buf;
-	static char	*save_buf;
-	char		*line;
+	static char	*save_buf = NULL;
+	static char	*line = NULL;
 	char		*temp;
 	int			r;
 
-	buf = (char *)ft_calloc(sizeof(char), BUFFER_SIZE  + 1);
+	buf = (char *)ft_calloc(sizeof(char), BUFFER_SIZE + 1);
 	r = read(fd, buf, BUFFER_SIZE);
 	if (r < 0 && !save_buf)
 		return (NULL);
-	line = NULL;
+	if (line)
+		free(line);
 	if (r == 0)
 	{
 		line = ft_substr(save_buf, 0, ft_len_to_n(save_buf));
@@ -259,21 +249,3 @@ void	*ft_calloc(size_t nmemb, size_t size)
 	}
 	return (obj);
 }
-
-// int	main(void)
-// {
-// 	int		fd;
-// 	char	*buf;
-// 	int		i;
-
-// 	i = 0;
-// 	fd = open("arquivo.txt", O_RDONLY);
-// 	while(i < 4)
-// 	{
-// 		printf(CYN "--- main while, iteração %d:\n" reset, i + 1);
-// 		buf = get_next_line(fd);
-// 		printf(YEL "retorno da gnl --->" reset GRN " %s\n" reset, buf);
-// 		i++;
-// 	}
-// 	return (0);
-// }
