@@ -6,11 +6,23 @@
 /*   By: lamorim <lamorim@student.42sp.org.br>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/23 10:57:44 by lamorim           #+#    #+#             */
-/*   Updated: 2021/09/06 19:17:47 by lamorim          ###   ########.fr       */
+/*   Updated: 2021/09/08 16:07:21 by lamorim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+//Regular text
+#define BLK "\e[0;30m"
+#define RED "\e[0;31m"
+#define GRN "\e[0;32m"
+#define YEL "\e[0;33m"
+#define BLU "\e[0;34m"
+#define MAG "\e[0;35m"
+#define CYN "\e[0;36m"
+#define WHT "\e[0;37m"
+#define reset "\e[0m"
+
 #include "get_next_line.h"
+#include <stdio.h>
 
 char	*ft_strjoin(const char *s1, const char *s2);
 void	*ft_calloc(size_t nmemb, size_t size);
@@ -21,18 +33,19 @@ void	*ft_memcpy(void *dest, const void *src, size_t n);
 size_t	ft_len_to_n(const char *s);
 char	*ft_substr(const char *s, unsigned int start, size_t len);
 size_t	ft_strlen(const char *s);
-char	*get_one_line(const char *buf, char *save_buf);
+char	*get_one_line(const char *buf, char **save_buf, char *line1);
 
 char	*get_next_line(int fd)
 {
 	char		*buf;
 	static char	*save_buf;
 	char		*line;
+	char		*temp;
 	int			r;
 
 	buf = (char *)ft_calloc(sizeof(char), BUFFER_SIZE  + 1);
 	r = read(fd, buf, BUFFER_SIZE);
-	if (r <= 0 && !save_buf)
+	if (r < 0 && !save_buf)
 		return (NULL);
 	line = NULL;
 	if (r == 0)
@@ -40,13 +53,16 @@ char	*get_next_line(int fd)
 		line = ft_substr(save_buf, 0, ft_len_to_n(save_buf));
 		free(save_buf);
 		save_buf = NULL;
+		free(buf);
+		buf = NULL;
 		return (line);
 	}
 	while (r > 0)
 	{
 		if (ft_strchr(buf, '\n'))
 		{
-			line = get_one_line(buf, save_buf);
+			line = get_one_line(buf, &save_buf, line);
+			free(buf);
 			return (line);
 		}
 		else
@@ -54,35 +70,41 @@ char	*get_next_line(int fd)
 			if (!save_buf)
 				save_buf = ft_substr(buf, 0, BUFFER_SIZE);
 			else
+			{
+				temp = save_buf;
 				save_buf = ft_strjoin(save_buf, buf);
+				free(temp);
+			}
 		}
 		r = read(fd, buf, BUFFER_SIZE);
 	}
+	free(buf);
 	return (line);
 }
 
-char	*get_one_line(const char *buf, char *save_buf)
+char	*get_one_line(const char *buf, char **save_buf, char *line1)
 {
 	size_t	len;
-	char	*line;
 	char	*temp;
 
 	len = ft_len_to_n(buf);
-	if (!save_buf)
+	if (!*save_buf)
 	{
-		save_buf = ft_substr(buf, len, BUFFER_SIZE - len);
-		line = ft_substr(buf, 0, len);
+		*save_buf = ft_substr(buf, len, BUFFER_SIZE - len);
+		line1 = ft_substr(buf, 0, len);
 	}
 	else
 	{
-		save_buf = ft_strjoin(save_buf, buf);
-		len = ft_len_to_n(save_buf);
-		line = ft_substr(save_buf, 0, len);
-		temp = save_buf;
-		save_buf = ft_strjoin(save_buf + len, "");
+		temp = *save_buf;
+		*save_buf = ft_strjoin(*save_buf, buf);
+		free(temp);
+		len = ft_len_to_n(*save_buf);
+		line1 = ft_substr(*save_buf, 0, len);
+		temp = *save_buf;
+		*save_buf = ft_strjoin(*save_buf + len, "");
 		free(temp);
 	}
-	return (line);
+	return (line1);
 }
 
 char	*ft_strjoin(const char *s1, const char *s2)
@@ -237,3 +259,21 @@ void	*ft_calloc(size_t nmemb, size_t size)
 	}
 	return (obj);
 }
+
+// int	main(void)
+// {
+// 	int		fd;
+// 	char	*buf;
+// 	int		i;
+
+// 	i = 0;
+// 	fd = open("arquivo.txt", O_RDONLY);
+// 	while(i < 4)
+// 	{
+// 		printf(CYN "--- main while, iteração %d:\n" reset, i + 1);
+// 		buf = get_next_line(fd);
+// 		printf(YEL "retorno da gnl --->" reset GRN " %s\n" reset, buf);
+// 		i++;
+// 	}
+// 	return (0);
+// }
