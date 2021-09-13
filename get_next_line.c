@@ -6,7 +6,7 @@
 /*   By: lamorim <lamorim@student.42sp.org.br>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/23 10:57:44 by lamorim           #+#    #+#             */
-/*   Updated: 2021/09/08 16:07:21 by lamorim          ###   ########.fr       */
+/*   Updated: 2021/09/13 14:37:46 by lamorim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,17 +18,15 @@ void	*ft_calloc(size_t nmemb, size_t size);
 size_t	ft_strlcpy(char *dst, char *src, size_t dstsize);
 char	*ft_strdup(const char *s);
 char	*ft_strchr(const char *s, int c);
-void	*ft_memcpy(void *dest, const void *src, size_t n);
 size_t	ft_len_to_n(const char *s);
 char	*ft_substr(const char *s, unsigned int start, size_t len);
-size_t	ft_strlen(const char *s);
 char	*get_one_line(const char *buf, char **save_buf, char *line1);
 
 char	*get_next_line(int fd)
 {
 	char		*buf;
 	static char	*save_buf = NULL;
-	static char	*line = NULL;
+	char		*line;
 	char		*temp;
 	int			r;
 
@@ -36,8 +34,7 @@ char	*get_next_line(int fd)
 	r = read(fd, buf, BUFFER_SIZE);
 	if (r < 0 && !save_buf)
 		return (NULL);
-	if (line)
-		free(line);
+	line = NULL;
 	if (r == 0)
 	{
 		line = ft_substr(save_buf, 0, ft_len_to_n(save_buf));
@@ -72,7 +69,7 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-char	*get_one_line(const char *buf, char **save_buf, char *line1)
+char	*get_one_line(const char *buf, char **save_buf, char *line)
 {
 	size_t	len;
 	char	*temp;
@@ -81,7 +78,7 @@ char	*get_one_line(const char *buf, char **save_buf, char *line1)
 	if (!*save_buf)
 	{
 		*save_buf = ft_substr(buf, len, BUFFER_SIZE - len);
-		line1 = ft_substr(buf, 0, len);
+		line = ft_substr(buf, 0, len);
 	}
 	else
 	{
@@ -89,30 +86,12 @@ char	*get_one_line(const char *buf, char **save_buf, char *line1)
 		*save_buf = ft_strjoin(*save_buf, buf);
 		free(temp);
 		len = ft_len_to_n(*save_buf);
-		line1 = ft_substr(*save_buf, 0, len);
+		line = ft_substr(*save_buf, 0, len);
 		temp = *save_buf;
 		*save_buf = ft_strjoin(*save_buf + len, "");
 		free(temp);
 	}
-	return (line1);
-}
-
-char	*ft_strjoin(const char *s1, const char *s2)
-{
-	char	*join;
-	size_t	s1_len;
-	size_t	s2_len;
-
-	if (!s1 || !s2)
-		return (NULL);
-	s1_len = ft_strlen(s1);
-	s2_len = ft_strlen(s2);
-	join = (char *) malloc(s1_len + s2_len + 1);
-	if (!join)
-		return (NULL);
-	ft_strlcpy(join, (char *) s1, s1_len + 1);
-	ft_strlcpy(join + s1_len, (char *) s2, s2_len + 1);
-	return (join);
+	return (line);
 }
 
 size_t	ft_strlcpy(char *dst, char *src, size_t dstsize)
@@ -134,6 +113,28 @@ size_t	ft_strlcpy(char *dst, char *src, size_t dstsize)
 		dst[dst_size] = '\0';
 	}
 	return (src_size);
+}
+
+char	*ft_strjoin(const char *s1, const char *s2)
+{
+	char	*join;
+	size_t	s1_len;
+	size_t	s2_len;
+
+	if (!s1 || !s2)
+		return (NULL);
+	s1_len = 0;
+	while (s1[s1_len])
+		s1_len++;
+	s2_len = 0;
+	while (s2[s2_len])
+		s2_len++;
+	join = (char *) malloc(s1_len + s2_len + 1);
+	if (!join)
+		return (NULL);
+	ft_strlcpy(join, (char *) s1, s1_len + 1);
+	ft_strlcpy(join + s1_len, (char *) s2, s2_len + 1);
+	return (join);
 }
 
 char	*ft_strchr(const char *s, int c)
@@ -172,11 +173,17 @@ char	*ft_strdup(const char *s)
 	char	*s_cpy;
 	size_t	s_len;
 
-	s_len = ft_strlen(s);
+	s_len = 0;
+	while (s[s_len])
+		s_len++;
 	s_cpy = (char *) malloc(s_len + 1);
 	if (!s_cpy)
 		return (NULL);
-	ft_memcpy(s_cpy, s, s_len);
+	while (s_len)
+	{
+		*s_cpy++ = *s++;
+		s_len--;
+	}
 	s_cpy[s_len] = '\0';
 	return (s_cpy);
 }
@@ -203,7 +210,9 @@ char	*ft_substr(const char *s, unsigned int start, size_t len)
 
 	if (!s)
 		return (NULL);
-	len_s = ft_strlen(s);
+	len_s = 0;
+	while (s[len_s])
+		len_s++;
 	if (start > len_s)
 		return (ft_strdup(""));
 	if (len_s < len)
@@ -219,16 +228,6 @@ char	*ft_substr(const char *s, unsigned int start, size_t len)
 	}
 	sub_s[len] = '\0';
 	return (sub_s);
-}
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	len;
-
-	len = 0;
-	while (s[len])
-		len++;
-	return (len);
 }
 
 void	*ft_calloc(size_t nmemb, size_t size)

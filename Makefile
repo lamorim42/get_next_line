@@ -25,7 +25,7 @@ fclean: clean
 	$(RM) a.out
 
 run:
-	@./a.out
+	./a.out
 
 re: fclean all
 
