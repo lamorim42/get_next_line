@@ -1,4 +1,4 @@
-SRC = get_next_line.c
+SRC = get_next_line.c get_next_line_utils.c
 MAIN = main.c
 OBJ = $(SRC:.c=.o)
 MAIN_OBJ = $(MAIN:.c=.o)
@@ -28,5 +28,9 @@ run:
 	./a.out
 
 re: fclean all
+
+git:
+	git status
+	git add .
 
 .PHONY: all clean fclean re
