@@ -6,11 +6,32 @@
 /*   By: lamorim <lamorim@student.42sp.org.br>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/14 16:49:11 by lamorim           #+#    #+#             */
-/*   Updated: 2021/09/14 16:49:44 by lamorim          ###   ########.fr       */
+/*   Updated: 2021/09/17 16:51:41 by lamorim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+size_t	ft_strlcpy(char *dst, char *src, size_t dstsize)
+{
+	size_t	src_size;
+	size_t	dst_size;
+
+	src_size = 0;
+	dst_size = 0;
+	while (src[src_size])
+		src_size++;
+	if (dstsize != 0)
+	{
+		while (dst_size < dstsize - 1 && src[dst_size] != '\0')
+		{
+			dst[dst_size] = src[dst_size];
+			dst_size++;
+		}
+		dst[dst_size] = '\0';
+	}
+	return (src_size);
+}
 
 char	*ft_strjoin(const char *s1, const char *s2)
 {
@@ -51,24 +72,11 @@ char	*ft_strchr(const char *s, int c)
 	return ((char *) '\0');
 }
 
-size_t	ft_len_to_n(const char *s)
-{
-	size_t	i;
-
-	i = 0;
-	while (s[i])
-	{
-		if (s[i] == '\n')
-			return (i + 1);
-		i++;
-	}
-	return (i);
-}
-
 char	*ft_strdup(const char *s)
 {
 	char	*s_cpy;
 	size_t	s_len;
+	size_t	i;
 
 	s_len = 0;
 	while (s[s_len])
@@ -76,27 +84,14 @@ char	*ft_strdup(const char *s)
 	s_cpy = (char *) malloc(s_len + 1);
 	if (!s_cpy)
 		return (NULL);
-	while (s_len)
+	i = 0;
+	while (i < s_len) 
 	{
-		*s_cpy++ = *s++;
-		s_len--;
+		s_cpy[i] = s[i];
+		i++;
 	}
-	s_cpy[s_len] = '\0';
+	s_cpy[i] = '\0';
 	return (s_cpy);
-}
-
-void	*ft_memcpy(void *dest, const void *src, size_t n)
-{
-	unsigned char	*dest_cpy;
-	unsigned char	*src_cpy;
-
-	if ((!dest && !src) || !n)
-		return (dest);
-	dest_cpy = (unsigned char *)dest;
-	src_cpy = (unsigned char *)src;
-	while (n--)
-		*dest_cpy++ = *src_cpy++;
-	return (dest);
 }
 
 char	*ft_substr(const char *s, unsigned int start, size_t len)
@@ -125,23 +120,4 @@ char	*ft_substr(const char *s, unsigned int start, size_t len)
 	}
 	sub_s[len] = '\0';
 	return (sub_s);
-}
-
-void	*ft_calloc(size_t nmemb, size_t size)
-{
-	void	*obj;
-	size_t	i;
-
-	if (nmemb * size > 2141483647)
-		return (NULL);
-	obj = malloc(size * nmemb);
-	if (!obj)
-		return (NULL);
-	i = 0;
-	while (i < size * nmemb)
-	{
-		((char *)obj)[i] = '\0';
-		i++;
-	}
-	return (obj);
 }

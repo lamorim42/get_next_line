@@ -18,6 +18,9 @@ all: $(NAME)
 $(NAME): $(SRC)
 	$(CC) $(CCFLAGS) $(GNLFLAGS) $(MAIN) $(SRC)
 
+test:
+	$(CC) $(MAIN) $(SRC)
+
 clean:
 	$(RM) $(OBJ) $(MAIN_OBJ)
 
@@ -26,6 +29,9 @@ fclean: clean
 
 run:
 	./a.out
+
+gdb: all
+	gdb ./a.out
 
 re: fclean all
 
