@@ -10,15 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*get_next_line(int fd)
 {
-	static char	*save_buf = NULL;
+	static char	*save_buf[FD_MAX];
 	char		*buf;
 	char		*line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd > FD_MAX)
 		return (NULL);
 	buf = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buf)
@@ -28,7 +28,7 @@ char	*get_next_line(int fd)
 		free(buf);
 		return (NULL);
 	}
-	read_file(fd, &buf, &save_buf, &line);
+	read_file(fd, &buf, &save_buf[fd], &line);
 	free(buf);
 	buf = NULL;
 	if (!line)

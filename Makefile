@@ -16,7 +16,7 @@ RM = rm -f
 all: $(NAME)
 
 $(NAME): $(SRC)
-	$(CC) $(CCFLAGS) $(GNLFLAGS) $(MAIN) $(SRC)
+	$(CC) $(CCFLAGS) $(MAIN) $(SRC)
 
 test:
 	$(CC) $(MAIN) $(SRC)
