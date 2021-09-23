@@ -1,16 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lamorim <lamorim@student.42sp.org.br>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/23 10:57:44 by lamorim           #+#    #+#             */
-/*   Updated: 2021/09/21 18:02:32 by lamorim          ###   ########.fr       */
+/*   Updated: 2021/09/23 10:47:26 by lamorim          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
+
+static void	read_file(int fd, char **buf, char **save_buf, char **line);
+static void	get_line(char **save_buf, char **line);
 
 char	*get_next_line(int fd)
 {
@@ -18,7 +21,7 @@ char	*get_next_line(int fd)
 	char		*buf;
 	char		*line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || fd > FD_MAX)
+	if (BUFFER_SIZE <= 0)
 		return (NULL);
 	buf = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buf)
@@ -36,7 +39,7 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-int	read_file(int fd, char **buf, char **save_buf, char **line)
+static void	read_file(int fd, char **buf, char **save_buf, char **line)
 {
 	char	*temp;
 	int		r;
@@ -58,10 +61,9 @@ int	read_file(int fd, char **buf, char **save_buf, char **line)
 		free(*line);
 		*line = NULL;
 	}
-	return (r);
 }
 
-void	get_line(char **save_buf, char **line)
+static void	get_line(char **save_buf, char **line)
 {
 	char	*temp;
 	int		i;
